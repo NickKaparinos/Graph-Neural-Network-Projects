@@ -7,36 +7,108 @@ Nick Kaparinos
 import numpy as np
 import random
 import torch_geometric
+import optuna
 import networkx as nx
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score, f1_score
+from torch_geometric.loader import DataLoader
 import wandb
 import torch
 import torch.nn.functional as F
-from torch_geometric.nn import GCNConv
+from torch_geometric.nn import GCNConv, SAGEConv, GINConv
+from sklearn.metrics import r2_score, mean_squared_error
+from statistics import mean
+from tqdm import tqdm
 
 debugging = False
 
 
-class GCN_model(torch.nn.Module):
-    def __init__(self, num_node_features, num_classes):
+class GNN_node_clasif_model(torch.nn.Module):
+    def __init__(self, num_node_features, gnn_layer_type, n_gnn_layers, n_neurons, n_linear_layers, num_classes):
         super().__init__()
-        self.conv1 = GCNConv(num_node_features, 16)
-        self.conv2 = GCNConv(16, num_node_features)
-        # self.linear = torch.nn.Linear(num_node_features, 128)
-        self.linear = torch.nn.LazyLinear(out_features=num_classes)
+        if gnn_layer_type == 'GCN':
+            gnn_layer = GCNConv
+        elif gnn_layer_type == 'Graph_Sage':
+            gnn_layer = SAGEConv
+        elif gnn_layer_type == 'GIN':
+            gnn_layer = GINConv
+        else:
+            raise ValueError('Unsupported GNN layer type!')
 
+        if gnn_layer_type == 'GIN':
+            self.conv1 = gnn_layer(torch.nn.Linear(num_node_features, n_neurons))
+            self.gnn_layers = [gnn_layer(torch.nn.Linear(n_neurons, n_neurons)) for _ in range(n_gnn_layers - 1)]
+            self.gnn_layers = torch.nn.ModuleList(self.gnn_layers)
+        else:
+            self.conv1 = gnn_layer(num_node_features, n_neurons)
+            self.gnn_layers = [gnn_layer(n_neurons, n_neurons) for _ in range(n_gnn_layers - 1)]
+            self.gnn_layers = torch.nn.ModuleList(self.gnn_layers)
+
+        self.linear_layers = [torch.nn.Linear(n_neurons, n_neurons) for _ in range(n_linear_layers - 1)]
+        self.linear_layers = torch.nn.ModuleList(self.linear_layers)
+
+        self.final_layer = torch.nn.Linear(n_neurons, num_classes)
         self.softmax = torch.nn.LogSoftmax(dim=1)
 
     def forward(self, data):
         x, edge_index = data.x, data.edge_index
 
         x = self.conv1(x, edge_index)
-        x = F.relu(x)
-        # x = F.dropout(x, training=self.training)
-        x = self.conv2(x, edge_index)
-        x = self.linear(x)
+        for i in range(len(self.gnn_layers)):
+            x = self.gnn_layers[i](x, edge_index)
+            x = F.relu(x)
+
+        for i in range(len(self.linear_layers)):
+            x = self.linear_layers[i](x)
+            x = F.relu(x)
+
+        x = self.final_layer(x)
         return self.softmax(x)
+
+
+def GNN_node_hypermodel(trial, num_node_features, num_classes, device):
+    gnn_layer_type = trial.suggest_categorical('gnn_layer_type', ['GCN', 'Graph_Sage', 'GIN'])
+    n_neurons = trial.suggest_int('n_neurons', 16, 256, 16)
+    n_gnn_layers = trial.suggest_int('n_gnn_layers', 1, 3)
+    n_linear_layers = trial.suggest_int('n_linear_layers', 1, 3)
+
+    model = GNN_node_clasif_model(num_node_features, gnn_layer_type, n_gnn_layers, n_neurons, n_linear_layers,
+                                  num_classes).to(device)
+    name = f'{gnn_layer_type},neurons{n_neurons},gnn_layers{n_gnn_layers},linear_layers{n_linear_layers}'
+    hyperparameters = {'gnn_layer_type': gnn_layer_type, 'n_neurons': n_neurons, 'n_gnn_layers': n_gnn_layers,
+                       'n_linear_layers': n_linear_layers}
+    return model, name, hyperparameters
+
+
+def define_objective(project, dataset, loss_fn, train_fn, hypermodel_fn, epochs, model_type, notes, device):
+    def objective(trial):
+        learning_rate = trial.suggest_float('learning_rate', low=1e-5, high=1e-1, step=0.001)
+        batch_size = 32
+        epoch_validation_accuracies = []
+
+        # Model
+        dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+        num_node_features = dataset.num_node_features
+        num_classes = dataset.num_classes
+        model, name, hyperparameters = hypermodel_fn(trial, num_node_features, num_classes, device)
+        optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+
+        config = dict(hyperparameters, **{'epochs': epochs, 'learning_rate': learning_rate, 'batch_size': batch_size})
+        wandb.init(project=project, entity="nickkaparinos", name=name, config=config, notes=notes,
+                   group=model_type, reinit=True)
+
+        for epoch in tqdm(range(1, epochs + 1)):
+            validation_accuracy = train_fn(dataloader, model, loss_fn, optimizer, epoch, device)
+            trial.report(validation_accuracy, epoch)
+            epoch_validation_accuracies.append(validation_accuracy)
+
+            # Pruning
+            # if trial.should_prune():
+            #     raise optuna.TrialPruned()
+
+        return max(epoch_validation_accuracies)
+
+    return objective
 
 
 def visualize_graph(g):
@@ -46,14 +118,6 @@ def visualize_graph(g):
     # nx.draw_kamada_kawai(g)
     # nx.draw_circular(g)
 
-    plt.show()
-
-
-def visualize_cora_graph(g):
-    g = torch_geometric.utils.to_networkx(g, to_undirected=True)
-    nx.draw_networkx(g)
-    # nx.draw_kamada_kawai(g, node_size=10)
-    # nx.draw_circular(g)
     plt.show()
 
 
@@ -98,6 +162,11 @@ def cora_train_one_epoch(dataloader, model, loss_fn, optimizer, epoch, device) -
                         'Training_f1': train_f1, 'Validation_accuracy': validation_accuracy,
                         'Validation_f1': validation_f1})
     return validation_accuracy
+
+
+def save_dict_to_file(dictionary, path, txt_name='hyperparameter_dict'):
+    with open(f'{path}/{txt_name}.txt', 'w') as f:
+        f.write(str(dictionary))
 
 
 def set_all_seeds(seed):

@@ -6,6 +6,7 @@ Nick Kaparinos
 
 from utilities import *
 import torch
+from os import makedirs
 import torch_geometric
 from torch_geometric.data import Data
 import matplotlib.pyplot as plt
@@ -20,18 +21,21 @@ if __name__ == '__main__':
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     device = 'cpu'
     print(f'Using device: {device}')
+    print(f'{debugging = }')
 
+    # Log directory
+    time_stamp = str(time.strftime('%d_%b_%Y_%H_%M_%S', time.localtime()))
+    LOG_DIR = f'logs/cora{time_stamp}/'
+    makedirs(LOG_DIR, exist_ok=True)
 
-
-    # Read enzymes dataset
+    # Read Ezymes dataset
     dataset = TUDataset(root='/tmp/ENZYMES', name='ENZYMES', use_node_attr=True)
     dataset = dataset.shuffle()
     num_node_features = dataset.num_node_features
     data = dataset[0].to(device)
 
-
     # GNN Model
-    model = GCN_model(num_node_features).to(device)
+    model = GNN_node_clasif_model(num_node_features).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
 
     # output = model(fet)
