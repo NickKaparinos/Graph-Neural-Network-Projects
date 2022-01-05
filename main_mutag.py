@@ -7,10 +7,9 @@ Nick Kaparinos
 from utilities import *
 import torch
 from os import makedirs
-import optuna
 import logging
 import sys
-from torch_geometric.datasets import Planetoid
+from torch_geometric.datasets import TUDataset
 from pickle import dump
 import time
 
@@ -19,26 +18,27 @@ if __name__ == '__main__':
     seed = 0
     set_all_seeds(seed=seed)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = 'cpu'
     print(f'Using device: {device}')
     print(f'{debugging = }')
 
     # Log directory
     time_stamp = str(time.strftime('%d_%b_%Y_%H_%M_%S', time.localtime()))
-    LOG_DIR = f'logs/cora{time_stamp}/'
+    LOG_DIR = f'logs/mutag{time_stamp}/'
     makedirs(LOG_DIR, exist_ok=True)
 
-    # Read Cora dataset
-    dataset = Planetoid(root='/tmp/Cora', name='Cora')
+    # Read MUTAG dataset
+    dataset = TUDataset(root='/tmp/TUDATASET', name='MUTAG', use_node_attr=True)
     dataset = dataset.shuffle()
 
-    # Hyperparameter optimization
-    project = 'Cora-GNN'
-    study_name = f'cora_study_{time_stamp}'
-    epochs = 12
+    # Hyperparameter optimisation
+    project = 'Mutag-GNN'
+    study_name = f'mutag_study_{time_stamp}'
+    epochs = 20
     loss_fn = torch.nn.NLLLoss()
     notes = ''
-    objective = define_objective(project=project, dataset=dataset, loss_fn=loss_fn, train_fn=cora_train_fn,
-                                 hypermodel_fn=GNN_node_hypermodel, epochs=epochs, notes=notes, seed=seed,
+    objective = define_objective(project=project, dataset=dataset, loss_fn=loss_fn, train_fn=graph_clasif_train_fn,
+                                 hypermodel_fn=GNN_graph_hypermodel, epochs=epochs, notes=notes, seed=seed,
                                  device=device)
     optuna.logging.get_logger("optuna").addHandler(logging.StreamHandler(sys.stdout))
     study = optuna.create_study(sampler=optuna.samplers.TPESampler(seed=seed), study_name=study_name,
