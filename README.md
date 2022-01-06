@@ -10,20 +10,15 @@ The Cora dataset consists of 2708 scientific publications classified into one of
 
 <p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/cora/cora-graph" alt="drawing" width="500"/></p>
 
-## Optimization Results
-<p float="left">
-  <img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/cora/contour.png" width="49.7%" /> 
-  <img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/cora/optimization_history.png" width="49.7%" />
-</p>
+#### Optimization Results
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/cora/contour.png" alt="drawing"/></p>
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/cora/W%26B%20Chart%201_4_2022%2C%201_07_08%20PM.png" alt="drawing"/></p>
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/cora/param_importances.png" alt="drawing"/></p>
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/cora/optimization_history.png" alt="drawing"/></p>
 
-<p float="left">
-  <img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/cora/param_importances.png" width="49.7%" /> 
-  <img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/cora/W%26B%20Chart%201_4_2022%2C%201_07_08%20PM.png" width="49.7%" />
-</p>
+#### Optimal Model
 
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/cora/cora_optimal_learning_curve.png" alt="drawing"/></p>
 
-## Optimal Model
-
-
-## Graph CLassification
+## Graph Classification
 Graph classification is the supervised task, at which the label of the graph is predicted by the network. First, a Deep Graph Neural Network outputs an embedding for each node. Subsequently, the embeddings are pooled are pooled and passed through a Multi Layer Perceptron (MLP) head, which predicts the graph label.
