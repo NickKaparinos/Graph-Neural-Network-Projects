@@ -31,7 +31,7 @@ The Cora dataset consists of 2708 scientific publications classified into one of
 The optimal model achieved **84%** validation accuracy.
 
 # Graph Classification
-Graph classification is the supervised task, at which the label of the graph is predicted by the network. First, a Deep Graph Neural Network outputs an embedding for each node. Subsequently, the embeddings are pooled are pooled and passed through a Multi Layer Perceptron (MLP) head, which predicts the graph label.
+Graph classification is the supervised task, at which the label of the graph is predicted by the network. First, a Deep Graph Neural Network outputs an embedding for each node. Subsequently, the embeddings are pooled and passed through a Multi Layer Perceptron (MLP) head, which predicts the graph label.
 
 ## MUTAG Dataset
 The MUTAG dataset consists of 188 chemical compounds divided into two classes according to their mutagenic effect on a bacterium. The chemical data was obtained from http://cdb.ics.uci.edu and converted to graphs, where vertices represent atoms and edges represent chemical bonds. Explicit hydrogen atoms have been removed and vertices are labeled by atom type and edges by bond type (single, double, triple or aromatic).
