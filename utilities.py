@@ -4,19 +4,19 @@ Nick Kaparinos
 2022
 """
 
-import numpy as np
 import random
-import torch_geometric
+import matplotlib.pyplot as plt
 import optuna
 import networkx as nx
-import matplotlib.pyplot as plt
-from sklearn.metrics import accuracy_score, f1_score
-from torch_geometric.loader import DataLoader
-import wandb
+import numpy as np
 import torch
 import torch.nn.functional as F
+import torch_geometric
+from sklearn.metrics import accuracy_score, f1_score
+from torch_geometric.loader import DataLoader
 from torch_geometric.nn import GCNConv, SAGEConv, GINConv, global_add_pool
 from tqdm import tqdm
+import wandb
 
 debugging = False
 
@@ -312,7 +312,7 @@ def build_gin_mlp(n_gin_linear_layers, num_node_features, n_neurons, fist_conv_l
     return torch.nn.Sequential(*layer_list)
 
 
-def visualize_graph(graph, visualisation_method='normal', save_figure=False, log_dir='/', figure_name='fig.png',
+def visualise_graph(graph, visualisation_method='normal', save_figure=False, log_dir='/', figure_name='fig.png',
                     title='Graph', dpi=300):
     """ Visualize input graph """
     visualisation_fn_dict = {'normal': nx.draw_networkx, 'kamada_kawai': nx.draw_kamada_kawai,
@@ -326,7 +326,7 @@ def visualize_graph(graph, visualisation_method='normal', save_figure=False, log
     font = {'fontsize': 18}
     plt.title(title, **font)
     if save_figure:
-        plt.savefig(log_dir + figure_name,dpi=dpi)
+        plt.savefig(log_dir + figure_name, dpi=dpi)
     else:
         plt.show()
 

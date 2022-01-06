@@ -4,21 +4,21 @@ Nick Kaparinos
 2022
 """
 
-from utilities import *
-import torch
-from os import makedirs
 import logging
 import sys
-from torch_geometric.datasets import TUDataset
-from pickle import dump
 import time
+from os import makedirs
+from pickle import dump
+import optuna
+import torch
+from torch_geometric.datasets import TUDataset
+from utilities import *
 
 if __name__ == '__main__':
     start = time.perf_counter()
     seed = 0
     set_all_seeds(seed=seed)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    device = 'cpu'
     print(f'Using device: {device}')
     print(f'{debugging = }')
 

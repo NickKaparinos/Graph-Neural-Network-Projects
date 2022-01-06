@@ -4,15 +4,14 @@ Nick Kaparinos
 2022
 """
 
+from utilities import *
+import torch
+from os import makedirs
 import logging
 import sys
-import time
-from os import makedirs
+from torch_geometric.datasets import TUDataset
 from pickle import dump
-import optuna
-import torch
-from torch_geometric.datasets import Planetoid
-from utilities import *
+import time
 
 if __name__ == '__main__':
     start = time.perf_counter()
@@ -24,27 +23,27 @@ if __name__ == '__main__':
 
     # Log directory
     time_stamp = str(time.strftime('%d_%b_%Y_%H_%M_%S', time.localtime()))
-    LOG_DIR = f'logs/cora{time_stamp}/'
+    LOG_DIR = f'logs/proteins_{time_stamp}/'
     makedirs(LOG_DIR, exist_ok=True)
 
-    # Read Cora dataset
-    dataset = Planetoid(root='/tmp/Cora', name='Cora')
+    # Read PROTEINS dataset
+    dataset = TUDataset(root='/tmp/TUDATASET', name='PROTEINS', use_node_attr=True)
     dataset = dataset.shuffle()
 
-    # Hyperparameter optimization
-    project = 'Cora-GNN'
-    study_name = f'cora_study_{time_stamp}'
-    epochs = 12
+    # Hyperparameter optimisation
+    project = 'Proteins-GNN'
+    study_name = f'proteins_study_{time_stamp}'
+    epochs = 15
     loss_fn = torch.nn.NLLLoss()
     notes = ''
-    objective = define_objective(project=project, dataset=dataset, loss_fn=loss_fn, train_fn=cora_train_fn,
-                                 hypermodel_fn=GNN_node_hypermodel, epochs=epochs, notes=notes, seed=seed,
+    objective = define_objective(project=project, dataset=dataset, loss_fn=loss_fn, train_fn=graph_clasif_train_fn,
+                                 hypermodel_fn=GNN_graph_hypermodel, epochs=epochs, notes=notes, seed=seed,
                                  device=device)
     optuna.logging.get_logger("optuna").addHandler(logging.StreamHandler(sys.stdout))
     study = optuna.create_study(sampler=optuna.samplers.TPESampler(seed=seed), study_name=study_name,
                                 direction='maximize', pruner=optuna.pruners.HyperbandPruner(),
                                 storage=f'sqlite:///{LOG_DIR}{study_name}.db', load_if_exists=True)
-    study.optimize(objective, n_trials=None, timeout=2 * 60)
+    study.optimize(objective, n_trials=None, timeout=2*60)
     print(f'Best hyperparameters: {study.best_params}')
     print(f'Best value: {study.best_value}')
 
