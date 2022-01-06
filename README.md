@@ -28,5 +28,46 @@ The Cora dataset consists of 2708 scientific publications classified into one of
 
 <p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/cora/cora_optimal_learning_curve.png" alt="drawing"/></p>
 
+The optimal model achieved **84%** validation accuracy.
+
 # Graph Classification
 Graph classification is the supervised task, at which the label of the graph is predicted by the network. First, a Deep Graph Neural Network outputs an embedding for each node. Subsequently, the embeddings are pooled are pooled and passed through a Multi Layer Perceptron (MLP) head, which predicts the graph label.
+
+## MUTAG Dataset
+The MUTAG dataset consists of 188 chemical compounds divided into two classes according to their mutagenic effect on a bacterium. The chemical data was obtained from http://cdb.ics.uci.edu and converted to graphs, where vertices represent atoms and edges represent chemical bonds. Explicit hydrogen atoms have been removed and vertices are labeled by atom type and edges by bond type (single, double, triple or aromatic).
+<p float="left">
+  <img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/mutag/mutag_graph0.png" width="32.9%" /> 
+  <img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/mutag/mutag_graph1.png" width="32.9%" />
+  <img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/mutag/mutag_graph2.png" width="32.9%" />
+</p>
+
+### Optimization Results
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/mutag/contour.png" alt="drawing"/></p>
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/mutag/mutag_parallel_coordinates_plot.png" alt="drawing"/></p>
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/mutag/param_importances.png" alt="drawing"/></p>
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/mutag/optimization_history.png" alt="drawing"/></p>
+
+### Optimal Model
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/mutag/mutag_optimal_model_curve.png" alt="drawing"/></p>
+
+
+The optimal model achieved **83.6%** validation accuracy.
+
+## PROTEINS Dataset
+PROTEINS is a dataset of proteins that are classified as enzymes or non-enzymes. Nodes represent the amino acids and two nodes are connected by an edge if they are less than 6 Angstroms apart. It consists of 1113 graphs with 39.06 nodes and 72.82 edges per graph on average.
+<p float="left">
+  <img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/proteins/PROTEINS_graph0.png" width="32.9%" /> 
+  <img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/proteins/PROTEINS_graph1.png" width="32.9%" />
+  <img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/proteins/PROTEINS_graph2.png" width="32.9%" />
+</p>
+
+### Optimization Results
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/proteins/contour.png" alt="drawing"/></p>
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/proteins/proteins_parallel_coordinates_plot.png" alt="drawing"/></p>
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/proteins/param_importances.png" alt="drawing"/></p>
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/proteins/optimization_history.png" alt="drawing"/></p>
+
+### Optimal Model
+<p align="center"><img src="https://github.com/NickKaparinos/Graph-Neural-Network-Projects/blob/master/Images/proteins/proteins_learning_curve.png" alt="drawing"/></p>
+
+The optimal model achieved **74.1%** validation accuracy.
