@@ -1,5 +1,8 @@
 # Graph Neural Network Projects
+
 A graph neural network (GNN) is a class of neural networks for processing data represented by graph data structures. They were popularized by their use in supervised learning on properties of various molecules.Since their inception, several variants of the simple message passing neural network (MPNN) framework have been proposed. Recently, Graph Neural Networks (GNNs) have gained increasing popularity in various domains, including social networks, knowledge graphs, life sciences and recommender systems. The power of GNNs in modeling the dependencies between nodes in a graph enables the breakthrough in the research area related to graph analysis. This repository contains various Graph Machine Learning projects solved using Deep Graph Neural Networks.
+
+--------------------------------------------------------------------------------
 
 - [Node Classification](#node-classification)
   * [Cora Dataset](#cora-dataset)
